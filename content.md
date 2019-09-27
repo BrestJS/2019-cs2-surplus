@@ -5,7 +5,7 @@ CoffeeScript2
 - retour sur les Promise
 - exemple avec `fs.promise`
 - générateurs à la `most-couchdb`
-- migration Stream → générateur
+- migration Object-Stream → générateur
 
 Surplus
 -------
