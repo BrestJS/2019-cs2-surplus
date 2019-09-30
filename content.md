@@ -1,4 +1,4 @@
-CoffeeScript2
+CoffeeScript(2)
 -------------
 
 ### History
@@ -6,7 +6,7 @@ CoffeeScript2
 - first release 24 december 2009 (jashkena)
 - lots of features made it into ECMAScript (`=>`, `class`, …)
 - v2 = community release (2017): `await`, JSX, …
-- new features = TC39 Stage 4 (`BigInt` → ``1n``)
+- new features = TC39 Stage 4 (`BigInt` → ``` `1n` ```)
 
 ### Syntax
 
