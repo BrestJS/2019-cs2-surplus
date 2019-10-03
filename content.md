@@ -210,9 +210,34 @@ do ->
     console.log v
 ```
 
-### Async generators (6)
+### Object Stream → async iterable stream
 
-- migration Object-Stream → générateur
+- before: filter function
+
+```coffeescript
+class objectFilterTransform extends Stream.Transform
+  constructor: (options,filter) ->
+    options.objectMode = true
+    super options
+    @filter = filter
+
+  _transform: (obj,dummy,next) ->
+    if await @filter(obj)
+      @push obj
+    next()
+    return
+```
+
+- after (`S` is actually an async iterable)
+
+```coffeescript
+verifier = (S) ->
+  for await obj from S
+    if await asyncVerifyObject(obj)
+      yield obj
+  return
+```
+
 
 Surplus
 -------
