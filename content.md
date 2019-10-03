@@ -19,6 +19,7 @@ my_fun = (modes,{define},more...) ->
 - Litterate CoffeScript (Markdown)
 ```coffeescript
 Calcule un carré
+----------------
 
     square = (x) -> x*x
 ```
@@ -27,7 +28,7 @@ Calcule un carré
 
 ```coffeescript
 for a in [0..10] by 2
-  console.log "even number #{a}"
+  assert a % 2 is 0
 ```
 
 ```coffeescript
@@ -45,9 +46,13 @@ for own k,v of cat
 - generator function: returns a generator
 
 ```coffeescript
-f = -> yield 3
-f().next()
-→ { value: 3, done: false }
+f = -> yield 42
+v = f()
+
+v.next()
+→ { value: 42, done: false }
+v.next()
+→ { value: 42, done: false }
 ```
 
 ### Generators (2)
@@ -60,9 +65,9 @@ natural = ->
     yield num
   return
 
-perfectSquares = ->
+perfectCubes = ->
   for num from natural()
-    yield num*num
+    yield num*num*num
   return
 
 do ->
@@ -70,41 +75,72 @@ do ->
     console.log v
 ```
 
-### Async generators (1)
+### Promise (1)
 
 - Promise: object with `.then( on_success, on_failure )`
 
 ```coffeescript
-p = Promise.resolve 3
-p.then (value) -> assert value is 3
+p = Promise.resolve 6
+p.then (value) -> assert value is 6
 ```
 
 ```coffeescript
-p = new Promise (resolve) -> resolve 4
-p.then (value) -> assert value is 4
+p = new Promise (resolve) -> resolve 7
+p.then (value) -> assert value is 7
 ```
-
-### Async generators (2)
-
-- async function: function that returns a Promise
 
 ```coffeescript
-f = -> Promise.resolve 3
-f().then (value) -> assert value is 3
+p = new Promise.reject new Error 'oops'
+p.catch (error) -> assert error.message is 'oops'
 ```
 
-### Async generators (3)
+### Promise (2)
 
 - `await` will interrupt execution and wait for the Promise to resolve
 
 ```coffeescript
 f = ->
-  value = await Promise.resolve 3
-  assert value is 3
+  value = await Promise.resolve 42
+  assert value is 42
 f()
 ```
 
-### Async generators (3b)
+### Promise (3)
+
+- shortest useful Promise
+
+```coffeescript
+sleep = (timeout) -> new Promise (resolve) -> setTimeout resolve, timeout
+
+do ->
+  console.log 'Ready?'
+  await sleep 1000
+  console.log 'Done.'
+```
+
+### Async function (1)
+
+- async function: function that returns a Promise
+
+```coffeescript
+f = -> Promise.resolve 42
+f().then (value) -> assert value is 42
+```
+
+### Async function (2)
+
+- a function containing `await` is itself an async function
+
+```
+f = -> Promise.resolve 7
+
+g = (x) -> x * await f()
+
+do ->
+  assert 42 is await g()
+```
+
+### Async function (3)
 
 ```coffeescript
 agent = require 'superagent'
@@ -113,16 +149,16 @@ do ->
   console.log text.length
 ```
 
-### Async generators (3)
+### Async function (4)
 
 ```coffeescript
 fs = (require 'fs').promises
 {mtime} = await fs.stat '/etc/motd'
 ```
 
-### Async generators (4)
+### Async generators (1)
 
-- async generator: generator that returns Promises
+- async generator: generator that yields Promises
 
 ```coffeescript
 f = (names) ->
@@ -141,14 +177,15 @@ do ->
 
 ### Async generators (5)
 
+- example: transform an API with pagination into a continuous stream of documents
+
 ```coffeescript
-findAsyncIterable = (params) ->
-  done = false
-  while not done  # iterate until we retrieve all data
+findAsyncIterable = (params,limit = 10) ->
+  until done      # iterate until we retrieve all data
     body = null
     until body?   # iterate until we get a valid response
       try
-        {body} = await agent.post buildURI(params)
+        {body} = await agent.post buildFindURL(params,limit)
       catch error
         if error.status is 404  # invalid query
           body = docs: []
