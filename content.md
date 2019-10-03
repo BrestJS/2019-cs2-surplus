@@ -85,7 +85,11 @@ p.then (value) -> assert value is 6
 ```
 
 ```coffeescript
-p = new Promise (resolve) -> resolve 7
+p = new Promise (resolve) ->
+  # compute, compute
+  resolve 7
+  return
+  
 p.then (value) -> assert value is 7
 ```
 
