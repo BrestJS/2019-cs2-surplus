@@ -136,12 +136,13 @@ f().then (value) -> assert value is 42
 - a function containing `await` is itself an async function
 
 ```
-f = -> Promise.resolve 7
+plus1 = (y) -> Promise.resolve y+1
 
-g = (x) -> x * await f()
+g = (x) -> x * await plus1 x
 
-do ->
-  assert 42 is await g()
+# two equivalent ways to test:
+g(6).then (v) -> v is 42
+do -> assert 42 is await g 6
 ```
 
 ### Async function (3)
