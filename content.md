@@ -71,7 +71,7 @@ perfectCubes = ->
   return
 
 do ->
-  for v from perfectSquares()
+  for v from perfectCubes()
     console.log v
 ```
 
