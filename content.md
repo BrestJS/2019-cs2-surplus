@@ -40,6 +40,8 @@ for own k,v of cat
   console.log "cat has #{v} #{k}"
 ```
 
+- warning: `of` in CS is `in` in JS
+
 ### Generators
 
 - generator: object with `.next()` → `{value,done}`
@@ -74,6 +76,8 @@ do ->
   for v from perfectCubes()
     console.log v
 ```
+
+- warning: `from` in CS is `of` in JS
 
 ### Promise (1)
 
@@ -212,7 +216,7 @@ do ->
 
 ### Object Stream → async iterable stream
 
-- before: filter function
+- before: Node.js `Stream Transform` (e.g.: filter function)
 
 ```coffeescript
 class objectFilterTransform extends Stream.Transform
@@ -228,14 +232,38 @@ class objectFilterTransform extends Stream.Transform
     return
 ```
 
-- after (`S` is actually an async iterable)
+- after (assuming `S` is an async iterable)
 
 ```coffeescript
-verifier = (S) ->
+verifier = (filter) -> (S) ->
   for await obj from S
-    if await asyncVerifyObject(obj)
+    if await filter(obj)
       yield obj
   return
+```
+
+### Object Stream → compatible with Node.js Streams
+
+```coffeescript
+fs = require 'fs'
+do ->
+  content = ''
+  for await chunk from fs.createReadStream 'file.json', encoding:'utf8'
+    content += chunk
+  console.log JSON.parse content
+```
+
+```coffeescript
+Stream = require 'stream'
+
+Yes = ->
+  loop
+    yield 'yes\n'
+  return
+
+Stream.Readable
+  .from Yes()
+  .pipe process.stdout
 ```
 
 
